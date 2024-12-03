@@ -1,11 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const cities = [
-  "New York", "Paris", "Tokyo", "Sydney"
-];
+//local test
+// const cities = [
+//   "New York", "Paris", "Tokyo", "Sydney"
+// ];
 
 const SearchCities = () => {
   const [searchCity, setSearchCity] = useState('');
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await fetch('https://etherqmshqkpehcowxqh.supabase.co/functions/v1/cities');
+        if (!response.ok) {
+          throw new Error('Fetching Error');
+        }
+        const data = await response.json();
+        setCities(data.map(city => city.name)); 
+      } catch (error) {
+        console.error('Erreur :', error);
+      }
+    };
+
+    fetchCities();
+  }, []);
 
   return (
     <div>
