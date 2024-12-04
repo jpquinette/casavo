@@ -1,4 +1,3 @@
-import './App.css';
 import SearchCities from './SearchCities';
 
 function App() {

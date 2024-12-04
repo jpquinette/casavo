@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 
-//local test
-// const cities = [
-//   "New York", "Paris", "Tokyo", "Sydney"
-// ];
-
 const SearchCities = () => {
   const [searchCity, setSearchCity] = useState('');
   const [cities, setCities] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -17,31 +13,45 @@ const SearchCities = () => {
           throw new Error('Fetching Error');
         }
         const data = await response.json();
-        setCities(data.map(city => city.name)); 
+        setCities(data.map(city => city.name));
       } catch (error) {
-        console.error('Erreur :', error);
+        console.error('Error :', error);
       }
     };
 
     fetchCities();
   }, []);
 
+  const filteredCities = cities.filter(city =>
+    city.toLowerCase().includes(searchCity.toLowerCase())
+  );
+
   return (
-    <div>
+    <div className="search-cities">
       <input
         type="text"
         placeholder="Your city ..."
         value={searchCity}
-        onChange={(e) => setSearchCity(e.target.value)} 
-        list="city-suggestions" 
+        onChange={(e) => setSearchCity(e.target.value)}
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 100)} 
       />
-      <datalist id="city-suggestions">
-        {cities
-          .filter(city => city.toLowerCase().includes(searchCity.toLowerCase())) 
-          .map((city, index) => (
-            <option key={index} value={city} />
+      {showSuggestions && filteredCities.length > 0 && (
+        <div className="suggestions">
+          {filteredCities.map((city, index) => (
+            <div
+              key={index}
+              className="suggestion-item"
+              onClick={() => {
+                setSearchCity(city);
+                setShowSuggestions(false);
+              }}
+            >
+              {city}
+            </div>
           ))}
-      </datalist>
+        </div>
+      )}
     </div>
   );
 };
