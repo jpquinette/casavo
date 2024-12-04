@@ -4,8 +4,8 @@ const SearchCities = ({ onCitySelect }) => {
   const [searchCity, setSearchCity] = useState('');
   const [cities, setCities] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedCityId, setSelectedCityId] = useState(null); // State variable to store the selected city's ID
-  const containerRef = useRef(null); // Reference to the component container
+  const [selectedCityId, setSelectedCityId] = useState(null); // Store the selected city's ID
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const fetchCities = async (query) => {
@@ -15,13 +15,11 @@ const SearchCities = ({ onCitySelect }) => {
           : `https://etherqmshqkpehcowxqh.supabase.co/functions/v1/cities`;
 
         const response = await fetch(url);
-
         if (!response.ok) {
           throw new Error('Fetching Error');
         }
-
         const data = await response.json();
-        setCities(data); // Store the complete city objects
+        setCities(data); // Store the city objects
       } catch (error) {
         console.error('Error:', error);
       }
@@ -48,7 +46,7 @@ const SearchCities = ({ onCitySelect }) => {
     };
   }, []);
 
-  const filteredCities = cities.filter(city =>
+  const filteredCities = cities.filter((city) =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
   );
 
@@ -57,15 +55,15 @@ const SearchCities = ({ onCitySelect }) => {
     setSearchCity(city.name); // Fill the input with the city name
     setShowSuggestions(false); // Close the dropdown
     setSelectedCityId(city.id); // Store the selected city ID in state
-    onCitySelect(city.id); // Pass the ID to the parent component
+    onCitySelect(city.id); // Pass the ID to the parent component (callback)
   };
 
   // Log the selected city ID after it is set
   useEffect(() => {
     if (selectedCityId) {
-      console.log('Finally, CITY SELECTED:', selectedCityId); // Log the final selected city ID
+      console.log('CITY SELECTED on CHILD:', selectedCityId); // Log the final selected city ID
     }
-  }, [selectedCityId]); // Run this effect when the selectedCityId changes
+  }, [selectedCityId]);
 
   return (
     <div className="search-cities" ref={containerRef}>
@@ -78,9 +76,9 @@ const SearchCities = ({ onCitySelect }) => {
       />
       {showSuggestions && filteredCities.length > 0 && (
         <div className="suggestions">
-          {filteredCities.map((city, index) => (
+          {filteredCities.map((city) => (
             <div
-              key={city.id || index} // Use city.id or index if city.id is missing
+              key={city.id} // Use city.id as the unique key
               className="suggestion-item"
               onClick={() => handleCitySelect(city)}
             >
