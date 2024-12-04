@@ -3,10 +3,13 @@ import SearchCities from './SearchCities';
 
 const App = () => {
   const [selectedCityId, setSelectedCityId] = useState(null); // State to store the selected city ID
+  const [selectedCityName, setSelectedCityName] = useState(''); // State to store the selected city name
 
-  const handleCitySelect = (cityId) => {
+  const handleCitySelect = (cityId, cityName) => {
     setSelectedCityId(cityId); // Store the selected city ID in the parent state
+    setSelectedCityName(cityName); // Store the selected city name in the parent state
     console.log('City ID received on PARENT:', cityId); // Log the city ID in the parent
+    console.log('City Name received on PARENT:', cityName); // Log the city name in the parent
   };
 
   return (
@@ -28,12 +31,16 @@ const App = () => {
         />
       </div>
 
-      {/* Display selected city ID */}
+      {/* Display selected city ID and Name */}
       <div className="uuid">
-        {selectedCityId && <p>Selected City ID: {selectedCityId}</p>} {/* Display the selected city ID */}
+        {selectedCityId && (
+          <p>
+            Selected City <b>{selectedCityName}</b> UUID: {selectedCityId} <br />
+          </p>
+        )}
       </div>
 
-      <h1>City Search</h1>
+      <h4>City Search</h4>
       <SearchCities onCitySelect={handleCitySelect} /> {/* Pass the handleCitySelect function as a prop */}
     </div>
   );

@@ -51,11 +51,18 @@ const SearchCities = ({ onCitySelect }) => {
   );
 
   const handleCitySelect = (city) => {
-    console.log('Selected City ID:', city.id); // Log the selected city ID
-    setSearchCity(city.name); // Fill the input with the city name
+    // Create a constant for the city name
+    const selectedCityName = city.name;
+
+    console.log('Selected City ID:', city.id); // Log the ID
+    console.log('Selected City Name:', selectedCityName); // Log the name
+
+    setSearchCity(selectedCityName); // Fill the input with the city name
     setShowSuggestions(false); // Close the dropdown
     setSelectedCityId(city.id); // Store the selected city ID in state
-    onCitySelect(city.id); // Pass the ID to the parent component (callback)
+    
+    // Pass both the ID and name to the parent component (callback)
+    onCitySelect(city.id, selectedCityName); 
   };
 
   // Log the selected city ID after it is set
