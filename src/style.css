@@ -5,11 +5,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #FD9920;
+
 }
 
 .search-cities {
   position: relative;
   width: 300px;
+  height: auto;
+  margin-bottom: 3em;
 }
 
 .suggestions {
@@ -33,3 +37,41 @@ body {
 .suggestion-item:hover {
   background-color: #f0f0f0;
 }
+
+/*FORM*/
+
+input {
+  background: none;
+  border-radius: 20px;
+  padding: 1em;
+  border: solid 1px #000;
+  color: #000; 
+}
+
+input::placeholder {
+  color: #000; 
+}
+
+.suggestions {
+  background: transparent;
+  border: none;
+  max-height: 200px;
+  width:fit-content;
+  overflow-y: auto; /* Active le défilement vertical */
+}
+
+/* Personnaliser la barre de défilement */
+.suggestions::-webkit-scrollbar {
+  width: 8px; /* Largeur de la barre de défilement */
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Couleur de la barre de défilement (thumb) */
+  border-radius: 10px; /* Arrondir les bords de la barre de défilement */
+}
+
+.suggestions::-webkit-scrollbar-track {
+  background-color: transparent; /* Couleur de la piste (track) de la barre de défilement */
+}
+
+.suggestion-item

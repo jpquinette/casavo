@@ -11,9 +11,30 @@ const App = () => {
 
   return (
     <div>
+      {/* Casavo logo */}
+      <div className="casavo-logo">
+        <img
+          alt="Casavo logo"
+          loading="lazy"
+          width="160"
+          height="32"
+          decoding="async"
+          data-nimg="1"
+          style={{ color: 'transparent' }}
+          srcset="https://casavo-wine.imgix.net/images/logo/main.webp?auto=format,compress 1x, https://casavo-wine.imgix.net/images/logo/main.webp?auto=format,compress 2x"
+          src="https://casavo-wine.imgix.net/images/logo/main.webp?auto=format,compress"
+          data-cmp-ab="2"
+          data-cmp-info="10"
+        />
+      </div>
+
+      {/* Display selected city ID */}
+      <div className="uuid">
+        {selectedCityId && <p>Selected City ID: {selectedCityId}</p>} {/* Display the selected city ID */}
+      </div>
+
       <h1>City Search</h1>
       <SearchCities onCitySelect={handleCitySelect} /> {/* Pass the handleCitySelect function as a prop */}
-      {selectedCityId && <p>Selected City ID: {selectedCityId}</p>} {/* Display the selected city ID */}
     </div>
   );
 };
