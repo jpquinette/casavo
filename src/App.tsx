@@ -1,13 +1,17 @@
-import SearchCities from './SearchCities';
+import SearchCities from "./SearchCities";
 
-function App() {
+const App = () => {
+  const handleCitySelect = (uuid) => {
+    console.log('Selected City UUID:', uuid);
+    // Add further logic with the UUID
+  };
 
   return (
-    <div className="app">
-      <h2>City Searcher</h2>
-      <SearchCities />
+    <div>
+      <h1>City Search</h1>
+      <SearchCities onCitySelect={handleCitySelect} />
     </div>
   );
-}
+};
 
 export default App;
