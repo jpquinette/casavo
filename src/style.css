@@ -1,28 +1,13 @@
-body{font-family: sans-serif;}
+body {
+  font-family: sans-serif;
+  margin: 0; 
+  height: 100vh; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .search-cities {
   position: relative;
-  width: 300px; /* Ajustez selon vos besoins */
-}
-
-.suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 200px; /* Limite la hauteur */
-  overflow-y: auto; /* Ajoute un scroll si nécessaire */
-  border: 1px solid #ccc;
-  background-color: #fff;
-  z-index: 1000;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.suggestion-item {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.suggestion-item:hover {
-  background-color: #f0f0f0;
+  width: 300px; 
 }
