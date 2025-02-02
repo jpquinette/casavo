@@ -1,21 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const SearchCities = ({ onCitySelect }) => {
-  const [searchCity, setSearchCity] = useState('');
+  const [searchCity, setSearchCity] = useState("");
   const [cities, setCities] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState(""); // Gère le délai de la recherche
 
+  const MIN_SEARCH_LENGTH = 2; // Longueur minimale avant recherche
+  const API_KEY = import.meta.env.VITE_NINJA_API_KEY; // Récupération de la clé API depuis .env
+
+  // Fonction pour récupérer les villes
   const fetchCities = async (query) => {
-    if (!query) return;
+    if (!query || query.length < MIN_SEARCH_LENGTH) return;
 
     try {
       const url = `https://api.api-ninjas.com/v1/city?name=${query}`;
-      console.log("Fetching from:", url); // Debug: voir l'URL
+      console.log("Fetching from:", url);
 
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'X-Api-Key': import.meta.env.VITE_NINJA_API_KEY, // Utilise la clé API depuis .env
+          "X-Api-Key": API_KEY,
         },
       });
 
@@ -24,22 +29,37 @@ const SearchCities = ({ onCitySelect }) => {
       }
 
       const data = await response.json();
-      console.log("Données reçues:", data); // Debug: voir la réponse
+      console.log("Données reçues:", data);
 
-      setCities(data || []);
+      // Vérifier que les villes commencent bien par la recherche
+      const filteredCities = data.filter((city) =>
+        city.name.toLowerCase().startsWith(query.toLowerCase())
+      );
+
+      setCities(filteredCities || []);
     } catch (error) {
       console.error("Erreur de récupération des villes:", error);
+      setCities([]); // En cas d'erreur, vider la liste
     }
   };
 
-  // Déclenche la recherche lorsqu'on tape dans le champ
+  // Utilisation du debounce pour éviter les requêtes excessives
   useEffect(() => {
-    if (searchCity.length > 0) {
-      fetchCities(searchCity);
-    } else {
-      setCities([]); // Vide la liste si le champ est vide
-    }
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchCity);
+    }, 300); // Délai de 300ms avant d'envoyer la requête
+
+    return () => clearTimeout(timer); // Nettoyage du timeout
   }, [searchCity]);
+
+  // Déclenche la recherche uniquement après debounce
+  useEffect(() => {
+    if (debouncedSearch.length >= MIN_SEARCH_LENGTH) {
+      fetchCities(debouncedSearch);
+    } else {
+      setCities([]);
+    }
+  }, [debouncedSearch]);
 
   return (
     <div className="search-cities">
@@ -49,17 +69,17 @@ const SearchCities = ({ onCitySelect }) => {
         value={searchCity}
         onChange={(e) => setSearchCity(e.target.value)}
         onFocus={() => setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Ferme après un délai court
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
       />
       {showSuggestions && cities.length > 0 && (
         <div className="suggestions">
           {cities.map((city, index) => (
             <div
-              key={index} // Utilisation de l'index ici, mais une ID unique serait préférable
+              key={index} // L'ID serait préférable
               className="suggestion-item"
               onClick={() => {
-                onCitySelect(city.name); // Retourne le nom de la ville
-                setSearchCity(city.name); // Remplit le champ avec la sélection
+                onCitySelect(city.name);
+                setSearchCity(city.name);
                 setShowSuggestions(false);
               }}
             >
