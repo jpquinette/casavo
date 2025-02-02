@@ -11,7 +11,7 @@ body {
 
 .search-cities {
   position: relative;
-  width: 300px;
+  /* width: 300px; */
   height: auto;
   margin-bottom: 3em;
 }

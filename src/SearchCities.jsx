@@ -1,64 +1,58 @@
 import { useState, useEffect } from "react";
 
+// Hook personnalisé pour le debounce
+const useDebounce = (value, delay = 300) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const SearchCities = ({ onCitySelect }) => {
   const [searchCity, setSearchCity] = useState("");
   const [cities, setCities] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [debouncedSearch, setDebouncedSearch] = useState(""); // Gère le délai de la recherche
+  const [error, setError] = useState(null);
+  const debouncedSearch = useDebounce(searchCity, 300);
 
-  const MIN_SEARCH_LENGTH = 2; // Longueur minimale avant recherche
-  const API_KEY = import.meta.env.VITE_NINJA_API_KEY; // Récupération de la clé API depuis .env
+  const API_KEY = import.meta.env.VITE_NINJA_API_KEY;
+  const MIN_SEARCH_LENGTH = 2;
 
-  // Fonction pour récupérer les villes
-  const fetchCities = async (query) => {
-    if (!query || query.length < MIN_SEARCH_LENGTH) return;
-
-    try {
-      const url = `https://api.api-ninjas.com/v1/city?name=${query}`;
-      console.log("Fetching from:", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "X-Api-Key": API_KEY,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Données reçues:", data);
-
-      // Vérifier que les villes commencent bien par la recherche
-      const filteredCities = data.filter((city) =>
-        city.name.toLowerCase().startsWith(query.toLowerCase())
-      );
-
-      setCities(filteredCities || []);
-    } catch (error) {
-      console.error("Erreur de récupération des villes:", error);
-      setCities([]); // En cas d'erreur, vider la liste
-    }
-  };
-
-  // Utilisation du debounce pour éviter les requêtes excessives
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchCity);
-    }, 300); // Délai de 300ms avant d'envoyer la requête
-
-    return () => clearTimeout(timer); // Nettoyage du timeout
-  }, [searchCity]);
-
-  // Déclenche la recherche uniquement après debounce
-  useEffect(() => {
-    if (debouncedSearch.length >= MIN_SEARCH_LENGTH) {
-      fetchCities(debouncedSearch);
-    } else {
+    if (debouncedSearch.length < MIN_SEARCH_LENGTH) {
       setCities([]);
+      return;
     }
+
+    const fetchCities = async () => {
+      try {
+        const response = await fetch(
+          `https://api.api-ninjas.com/v1/city?name=${debouncedSearch}`,
+          { headers: { "X-Api-Key": API_KEY } }
+        );
+
+        if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+
+        const data = await response.json();
+        setCities(
+          data.filter((city) =>
+            city.name.toLowerCase().startsWith(debouncedSearch.toLowerCase())
+          )
+        );
+        setError(null);
+      } catch (error) {
+        console.error("Erreur de récupération des villes:", error);
+        setError("Impossible de charger les villes.");
+      }
+    };
+
+    fetchCities();
   }, [debouncedSearch]);
 
   return (
@@ -68,19 +62,17 @@ const SearchCities = ({ onCitySelect }) => {
         placeholder="Your city ..."
         value={searchCity}
         onChange={(e) => setSearchCity(e.target.value)}
-        onFocus={() => setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
       />
-      {showSuggestions && cities.length > 0 && (
+      {error && <p className="error">{error}</p>}
+      {cities.length > 0 && (
         <div className="suggestions">
           {cities.map((city, index) => (
             <div
-              key={index} // L'ID serait préférable
+              key={index} // L'API ne fournit pas d'ID, on utilise l'index ici
               className="suggestion-item"
               onClick={() => {
                 onCitySelect(city.name);
                 setSearchCity(city.name);
-                setShowSuggestions(false);
               }}
             >
               {city.name}, {city.country}
